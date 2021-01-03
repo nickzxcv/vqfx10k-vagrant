@@ -95,7 +95,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         (1..2).each do |srvcounter|
             srv_name  = ( "srv" + id.to_s + srvcounter.to_s).to_sym
             $provisioning = <<-SCRIPT
-            sudo ip route add 10.10.0.0/16 via 10.10.#{srvcounter}.254 # route for lab network
+            # route for lab network
+            echo "Adding route 10.10.0.0/16"
+            sudo ip route add 10.10.0.0/16 via 10.10.${1}.254 \
+            && ip route list 10.10.0.0/16 || echo "Failed to add route 10.10.0.0/16" >&2
+            # install some packages
             sudo apt-get update
             sudo apt-get -y install lldpd mtr-tiny inetutils-traceroute ncurses-term
             SCRIPT
@@ -111,8 +115,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                     virtualbox__intnet: "#{UUID}_vqfx#{id}_seg#{srvcounter}"
 
                 srv.ssh.insert_key = true
-                srv.vm.provision "shell",
-                    inline: $provisioning
+                srv.vm.provision "shell" do |script|
+                    script.inline = $provisioning
+                    # need to pass in subnet number like this to avoid lazy loading
+                    # mentioned in https://www.vagrantup.com/docs/vagrantfile/tips
+                    script.args = "#{srvcounter}"
+                end
             end
         end
     end
