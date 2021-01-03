@@ -97,18 +97,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         
             config.vm.define srv_name do |srv|
             
-                # Uncomment 1 line below to use minitrusty image instead of Tiny Core linux. Comment Tiny Core further down. "minitrusty" takes 512MB RAM per instance.
-                 srv.vm.box = "robwc/minitrusty64"
+                # "minitrusty" takes 512MB RAM per instance.
+                srv.vm.box = "robwc/minitrusty64"
             
-                # Tiny-Core linux needs extras cuz not well supported with Vagrant. Only 64M of RAM per instance! Has ping, ssh, ssh server.
-                # Comment ines below this line and uncomment minitrusty64 above to swap server images
-                # srv.vm.box = "olbat/tiny-core-micro"
-                #srv.vm.synced_folder '.', 
-                #    '/vagrant', 
-                #    disabled: true
-                #config.ssh.shell = "sh -l"
-                # End Tiny-Core
-
                 srv.vm.hostname = "#{srv_name}"
                 srv.vm.network 'private_network', 
                     ip: "10.10.#{srvcounter}.#{id}0", 
@@ -117,7 +108,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                 srv.ssh.insert_key = true
                 srv.vm.provision "shell",
                     inline: "sudo route add -net 10.10.0.0/16 gw 10.10.#{srvcounter}.254" # ubuntu
-                    #inline: "sudo route add 0/0 gw 10.10.#{srvcounter}.254" # Tiny-Core
             end
         end
     end
