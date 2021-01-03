@@ -107,7 +107,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
                 srv.ssh.insert_key = true
                 srv.vm.provision "shell",
-                    inline: "sudo route add -net 10.10.0.0/16 gw 10.10.#{srvcounter}.254" # ubuntu
+                    inline: "sudo ip route add 10.10.0.0/16 via 10.10.#{srvcounter}.254" # route for lab network
             end
         end
     end
